@@ -1,5 +1,9 @@
 package com.example.questionproject;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -19,13 +23,14 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView questionView;
     private int currentQuetionId = 0;
+    private boolean mIsCheater;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Question q1 = new Question(0,getString(R.string.question_1), true);
-        Question q2 = new Question(1,getString(R.string.question_2), false);
+        Question q2 = new Question(1,"2 + 4 = 8", false);
         Question q3 = new Question(2,getString(R.string.question_3), false);
         Question q4 = new Question(3,getString(R.string.question_4), false);
         Question q5 = new Question(4,getString(R.string.question_5), false);
@@ -94,10 +99,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, Cheat.class);
                 intent.putExtra("answer",listQuestion[currentQuetionId].getAnswer().toString());
+                intent.putExtra("currentQuetionId",currentQuetionId);
                 startActivity(intent);
             }
         });
-
+        ActivityResultLauncher<Intent> startActivity4Result = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult o) {
+                        if(o != null && o.getResultCode() == RESULT_OK)
+                            if (o.getData() != null)
+                                mIsCheater = Cheat.getAmswerShow(o.getData());
+                    }
+                });
 
     }
 }
